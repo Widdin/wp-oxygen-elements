@@ -1,0 +1,169 @@
+<?php
+
+class PostFilter extends OxyEl {
+
+    function init() {
+		add_action('wp_ajax_postsfilter', [$this, 'posts_filter_function']); 
+		add_action('wp_ajax_nopriv_postsfilter', [$this, 'posts_filter_function']);
+    }
+
+    function afterInit() {
+        $this->removeApplyParamsButton();
+    }
+
+    function name() {
+        return 'Posts Filter';
+    }
+    
+    function slug() {
+        return "post-filter";
+    }
+
+    function icon() {
+		return plugin_dir_url( __FILE__ ).basename(__FILE__, '.php').'.svg';
+    }
+	
+    function controls() {
+		
+    }
+
+    function defaultCSS() {
+        return file_get_contents(__DIR__.'/'.basename(__FILE__, '.php').'.css');
+    }
+
+    function render($options, $defaults, $content) {
+		?>
+		<form action="<?php echo site_url() ?>/wp-admin/admin-ajax.php" method="POST" id="filter">
+
+			<?php
+			if( $terms = get_terms( array( 'taxonomy' => 'category', 'orderby' => 'name' ) ) ) {
+
+
+				$total_count = 0;
+				$output = "";
+				
+				echo '<div class="radio-toolbar">';
+				
+				foreach ( $terms as $term ) {
+					$total_count += $term->count;
+
+					$input = '<input id="' . $term->name . '" type="radio" class="posts-filter" name="posts_category" value="' . $term->term_id . '" />';
+					$label =  '<label for="' . $term->name . '" class="radio-filter">' . $term->name . " (" . $term->count . ') </label>';
+
+					$output .= $input . $label;
+				}
+
+				echo '<input id="all" type="radio" class="posts-filter" name="posts_category" value="-1" checked />';
+				echo '<label for="all">All (' . $total_count . ')</label>';
+
+				echo $output;
+
+				echo '</select>';
+				
+				echo '</div>';
+			}
+			?>
+
+			<input type="hidden" name="action" value="postsfilter">
+		</form>
+
+		<div id="response"/>
+		<?php
+		
+		$this->El->footerJS(file_get_contents(__DIR__.'/'.basename(__FILE__, '.php').'.js'));
+    }
+    
+	function posts_filter_function(){
+		
+		$paged = 1;
+		
+		if( isset($_POST['paged'])) {
+			$paged = $_POST['paged'];
+		}
+		
+		$args = array(
+			'post_type' => 'post',
+			'post_status' => 'publish',
+			'paged' => $paged
+		);
+		
+		// for taxonomies / categories
+		if( isset( $_POST['posts_category'] ) &&  $_POST['posts_category'] != -1 )
+			$args['tax_query'] = array(
+			array(
+				'taxonomy' => 'category',
+				'field' => 'id',
+				'terms' => $_POST['posts_category']
+			)
+		);
+		
+		$query = new WP_Query( $args );
+
+		if( $query->have_posts() ) {
+			
+			if ( $paged == 1 ) {
+				echo '<div class="posts">';
+			}
+			
+			while ( $query->have_posts() ) {
+				$query->the_post(); ?>
+				
+				<div class="post-container loading lazy">
+					
+					<?php
+						$id = get_post_thumbnail_id();
+						
+						$attachment = wp_get_attachment_image_src( $id, 'full');
+						$src 	= wp_get_attachment_image_url( $id, 'full' );
+						$srcset = wp_get_attachment_image_srcset( $id, 'full' );
+						$sizes 	= wp_get_attachment_image_sizes( $id, 'full' );
+
+						echo '<img style="aspect-ratio: '.$attachment[1].'/'.$attachment[2].';" class="post-image" data-src="'. $src .'" data-srcset="' . $srcset . '" sizes="' . $sizes . '" />';
+					?>
+
+					<div class="post-content">
+						
+						<div class="post-categories">
+							<?php 
+								foreach ( ( get_the_category() ) as $category ) {
+									echo '<div class="post-category '.$category->slug.'">' . $category->cat_name . '</div>';
+								} 
+							?>
+						</div>
+						
+						<h4 class="post-title">
+							<?php the_title(); ?>
+						</h4>
+						
+						<p class="post-excerpt">
+							<?php echo  get_the_excerpt(); ?>
+						</p> 
+
+						<a class="post-link" href="<?php the_permalink(); ?>">
+							Read more
+						</a>
+					
+					</div>
+				</div>
+				<?php
+			}
+			
+			if ( $paged == 1 ) {
+				echo '</div>';
+			}
+
+			if ($query->max_num_pages > 1 && $paged < $query->max_num_pages) {
+				echo '<button id="load_more" data-current-page="'. $paged .'" data-next-page="'. ($paged + 1) .'" data-max-page="'. $query->max_num_pages .'" onClick="load_more()">Load more</button>';
+			}
+	
+			wp_reset_postdata();
+		}
+		else {
+			echo 'No posts found';
+		}
+		
+		die();
+	}	
+}
+
+new PostFilter();
