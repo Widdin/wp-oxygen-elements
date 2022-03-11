@@ -1,6 +1,6 @@
 ## 🎨 Custom Elements for [Oxygen Builder](https://oxygenbuilder.com/)
 Free custom elements for the WordPress plugin Oxygen Builder.  
-If you find the tutorials interesting, click on the star ⭐ in the top-right corner of the page! 
+If you find the elements useful, click on the star ⭐ in the top-right corner of the page! 
 
 ### Elements
  * Posts Filter
