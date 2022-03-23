@@ -24,7 +24,84 @@ class PostFilter extends OxyEl {
     }
 	
     function controls() {
-		
+
+        // Filter
+        $filter_section = $this->addControlSection("filter_section", __("Filter"), "assets/icon.png", $this);
+        $filter_section->typographySection(
+            __("Typography"),
+            '.radio-toolbar label',
+            $this
+        );
+        $filter_section->borderSection(
+            __("Borders"),
+            ".radio-toolbar label",
+            $this
+        );
+        $filter_section->addStyleControl(
+            array(
+                "name" => __('Background Color'),
+                "selector" => ".radio-toolbar label",
+                "property" => 'background-color',
+                "control_type" => "colorpicker"
+            )
+        );
+
+        // Filter Active
+        $filter_active_section = $this->addControlSection("filter_active_section", __("Filter Active"), "assets/icon.png", $this);
+        $filter_active_section->typographySection(
+            __("Typography"),
+            ".radio-toolbar input[type='radio']:checked+label",
+            $this
+        );
+        $filter_active_section->borderSection(
+            __("Borders"),
+            ".radio-toolbar input[type='radio']:checked+label",
+            $this
+        );
+        $filter_active_section->addStyleControl(
+            array(
+                "name" => __('Background Color'),
+                "selector" => ".radio-toolbar input[type='radio']:checked+label",
+                "property" => 'background-color',
+                "control_type" => "colorpicker"
+            )
+        );
+
+        // Title
+        $title_section = $this->addControlSection("title_section", __("Title"), "assets/icon.png", $this);
+        $title_section->typographySection(
+            __("Typography"),
+            '.post-title',
+            $this
+        );
+
+        // Excerpt
+        $excerpt_section = $this->addControlSection("excerpt_section", __("Excerpt"), "assets/icon.png", $this);
+        $excerpt_section->typographySection(
+            __("Typography"),
+            '.post-excerpt',
+            $this
+        );
+
+        // Categories
+        $terms = get_terms( array( 'taxonomy' => 'category', 'orderby' => 'name' ) );
+        foreach ($terms as $term) {
+            $category_section = $this->addControlSection($term->slug, __("Category " . $term->name), "assets/icon.png", $this);
+            $category_section->addStyleControl(
+                array(
+                    "name" => __('Background Color'),
+                    "selector" => '.' . $term->slug . '',
+                    "property" => 'background-color',
+                    "control_type" => "colorpicker"
+                )
+            );
+            $category_section->typographySection(
+                __("Typography"),
+                '.' . $term->slug . '',
+                $this
+            );
+        }
+        
     }
 
     function defaultCSS() {
