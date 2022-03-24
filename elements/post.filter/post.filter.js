@@ -59,6 +59,7 @@ function sendAJAX(loadMoreData) {
 		url:filter.attr('action'),
 		data:data,
 		type:filter.attr('method'),
+		startTime:new Date().getTime(),
 		beforeSend:function(xhr){
 			disableButtons();
 			
