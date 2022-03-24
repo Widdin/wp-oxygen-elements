@@ -150,29 +150,28 @@ class PostFilter extends OxyEl {
     }
     
 	function posts_filter_function(){
-		
+
 		$paged = 1;
-		
+
 		if( isset($_POST['paged'])) {
-			$paged = $_POST['paged'];
+			$paged = sanitize_text_field( $_POST['paged'] );
 		}
-		
+
 		$args = array(
 			'post_type' => 'post',
 			'post_status' => 'publish',
 			'paged' => $paged
 		);
-		
-		// for taxonomies / categories
+
 		if( isset( $_POST['posts_category'] ) &&  $_POST['posts_category'] != -1 )
 			$args['tax_query'] = array(
 			array(
 				'taxonomy' => 'category',
 				'field' => 'id',
-				'terms' => $_POST['posts_category']
+				'terms' => sanitize_text_field( $_POST['posts_category'] )
 			)
 		);
-		
+
 		$query = new WP_Query( $args );
 
 		if( $query->have_posts() ) {
