@@ -110,28 +110,27 @@ class PostFilter extends OxyEl {
 
     function render($options, $defaults, $content) {
 		?>
-		<form action="<?php echo site_url() ?>/wp-admin/admin-ajax.php" method="POST" id="filter">
+		<form action="<?php echo esc_url( site_url() ) ?>/wp-admin/admin-ajax.php" method="POST" id="filter">
 
 			<?php
 			if( $terms = get_terms( array( 'taxonomy' => 'category', 'orderby' => 'name' ) ) ) {
 
-
 				$total_count = 0;
 				$output = "";
-				
+
 				echo '<div class="radio-toolbar">';
-				
+
 				foreach ( $terms as $term ) {
 					$total_count += $term->count;
 
-					$input = '<input id="' . $term->name . '" type="radio" class="posts-filter" name="posts_category" value="' . $term->term_id . '" />';
-					$label =  '<label for="' . $term->name . '" class="radio-filter">' . $term->name . " (" . $term->count . ') </label>';
+					$input = '<input id="' . esc_html( $term->name ) . '" type="radio" class="posts-filter" name="posts_category" value="' . esc_html( $term->term_id ) . '" />';
+					$label =  '<label for="' . esc_html( $term->name ) . '" class="radio-filter">' . esc_html( $term->name ) . " (" . esc_html( $term->count ) . ') </label>';
 
 					$output .= $input . $label;
 				}
 
 				echo '<input id="all" type="radio" class="posts-filter" name="posts_category" value="-1" checked />';
-				echo '<label for="all">All (' . $total_count . ')</label>';
+				echo '<label for="all">All (' . esc_html( $total_count ) . ')</label>';
 
 				echo $output;
 
@@ -146,8 +145,8 @@ class PostFilter extends OxyEl {
 
 		<div id="response"/>
 		<?php
-		
-		$this->El->footerJS(file_get_contents(__DIR__.'/'.basename(__FILE__, '.php').'.js'));
+
+		$this->El->inlineJS(file_get_contents(__DIR__.'/'.basename(__FILE__, '.php').'.js'));
     }
     
 	function posts_filter_function(){
@@ -203,20 +202,20 @@ class PostFilter extends OxyEl {
 						<div class="post-categories">
 							<?php 
 								foreach ( ( get_the_category() ) as $category ) {
-									echo '<div class="post-category '.$category->slug.'">' . $category->cat_name . '</div>';
+									echo '<div class="post-category ' . esc_html( $category->slug ) . '">' . esc_html( $category->cat_name ) . '</div>';
 								} 
 							?>
 						</div>
 						
 						<h4 class="post-title">
-							<?php the_title(); ?>
+							<?php esc_html( the_title() ); ?>
 						</h4>
 						
 						<p class="post-excerpt">
-							<?php echo  get_the_excerpt(); ?>
+							<?php echo  esc_html( get_the_excerpt() ); ?>
 						</p> 
 
-						<a class="post-link" href="<?php the_permalink(); ?>">
+						<a class="post-link" href="<?php esc_url( the_permalink() ); ?>">
 							Read more
 						</a>
 					
@@ -230,7 +229,7 @@ class PostFilter extends OxyEl {
 			}
 
 			if ($query->max_num_pages > 1 && $paged < $query->max_num_pages) {
-				echo '<button id="load_more" data-current-page="'. $paged .'" data-next-page="'. ($paged + 1) .'" data-max-page="'. $query->max_num_pages .'" onClick="load_more()">Load more</button>';
+				echo '<button id="load_more" data-current-page="'. esc_html( $paged ) .'" data-next-page="'. esc_html( ($paged + 1) ) .'" data-max-page="'. esc_html( $query->max_num_pages ) .'" onClick="load_more()">Load more</button>';
 			}
 	
 			wp_reset_postdata();
