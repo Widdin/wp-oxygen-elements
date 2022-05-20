@@ -42,6 +42,46 @@ class GalleryFilter extends OxyEl {
 		$cpt_control->setDefaultValue('ACF');
 		$cpt_control->whitelist();
 		$cpt_control->rebuildElementOnChange();
+		
+        $filter_section = $this->addControlSection("filter_section", __("Filter"), "assets/icon.png", $this);
+        $filter_section->typographySection(
+            __("Typography"),
+            '.radio-toolbar label',
+            $this
+        );
+        $filter_section->borderSection(
+            __("Borders"),
+            ".radio-toolbar label",
+            $this
+        );
+        $filter_section->addStyleControl(
+            array(
+                "name" => __('Background Color'),
+                "selector" => ".radio-toolbar label",
+                "property" => 'background-color',
+                "control_type" => "colorpicker"
+            )
+        );
+		
+        $filter_active_section = $this->addControlSection("filter_active_section", __("Filter Active"), "assets/icon.png", $this);
+        $filter_active_section->typographySection(
+            __("Typography"),
+            ".radio-toolbar input[type='radio']:checked+label",
+            $this
+        );
+        $filter_active_section->borderSection(
+            __("Borders"),
+            ".radio-toolbar input[type='radio']:checked+label",
+            $this
+        );
+        $filter_active_section->addStyleControl(
+            array(
+                "name" => __('Background Color'),
+                "selector" => ".radio-toolbar input[type='radio']:checked+label",
+                "property" => 'background-color',
+                "control_type" => "colorpicker"
+            )
+        );
     }
 
     function defaultCSS() {
