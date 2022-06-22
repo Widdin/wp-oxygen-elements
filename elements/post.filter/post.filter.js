@@ -83,6 +83,7 @@ function sendAJAX(loadMoreData) {
 				if (loadMoreData) {
 					jQuery('.posts').append(data);
 					incrementLoadMore();
+					disableLoadMore(false);
 				} else {
 					jQuery('#response').html(data);
 				}
@@ -126,4 +127,29 @@ function incrementLoadMore() {
 	if (loadMore.dataset.currentPage == loadMore.dataset.maxPage) {
 		jQuery('#load_more').css('visibility', 'hidden');
 	}
+}
+
+jQuery( document ).on('scroll', function(e) {
+	var isInfinite = jQuery('input[name=infinite_scroll]').val() === 'true';
+
+	if (isInfinite) {
+
+		var loadMoreButton = document.getElementById("load_more");
+
+		var isDisabled = loadMoreButton.disabled;
+		var isHidden = loadMoreButton.style.visibility === 'hidden';
+
+		var offsetTop = (loadMoreButton.getBoundingClientRect().top + document.documentElement.scrollTop);
+
+		if( (jQuery(this).scrollTop() + jQuery(window).height() ) >= offsetTop && !isDisabled && !isHidden){
+			disableLoadMore(true);
+			var event = document.createEvent('HTMLEvents');
+			event.initEvent('click', true, false);
+			loadMoreButton.dispatchEvent(event);
+		}
+	}
+});
+
+function disableLoadMore(disabled) {
+	document.getElementById("load_more").disabled = disabled;
 }

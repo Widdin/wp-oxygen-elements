@@ -25,18 +25,26 @@ class PostFilter extends OxyEl {
 	
     function controls() {
 
-        // Query Settings
-        $query_section = $this->addControlSection("query_section", __("Query Settings"), "assets/icon.png", $this);
-        $query_per_page = $query_section->addOptionControl(
+        // Extra Settings
+        $extra_section = $this->addControlSection("extra_section", __("Extra Settings"), "assets/icon.png", $this);
+        $ppp_option = $extra_section->addOptionControl(
             array(
                 "type" => 'textfield',
                 "name" => 'Posts per page',
                 "slug" => 'posts_per_page'
             )
         );
-        $query_per_page->rebuildElementOnChange();
-        $query_per_page->setDefaultValue('10');
-        $query_per_page->whitelist();
+        $ppp_option->rebuildElementOnChange();
+        $ppp_option->setDefaultValue('10');
+        $ppp_option->whitelist();
+
+        $infinite_option = $extra_section->addOptionControl(
+            array(
+                "type" => 'checkbox',
+                "name" => 'Infinite Scroll',
+                "slug" => 'infinite_scroll'
+            )
+        );
 
         // Filter
         $filter_section = $this->addControlSection("filter_section", __("Filter"), "assets/icon.png", $this);
@@ -150,6 +158,7 @@ class PostFilter extends OxyEl {
 				echo '</div>';
 			}
 			?>
+			<input type="hidden" name="infinite_scroll" value="<?= $options['infinite_scroll'] ?>">
 			<input type="hidden" name="posts_per_page" value="<?= $options['posts_per_page'] ?>">
 			<input type="hidden" name="action" value="postsfilter">
 		</form>
