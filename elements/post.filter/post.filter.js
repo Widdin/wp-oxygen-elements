@@ -1,7 +1,13 @@
 var lazyImageObserver;
-		
-jQuery( document ).ready(function($) {
+
+function documentReady(fn) {
+  if (document.readyState != 'loading'){ fn(); }
+  else { document.addEventListener('DOMContentLoaded', fn); }
+}
+
+documentReady(function() {
 	
+	// Lazy load
 	lazyImageObserver = new IntersectionObserver(function(entries, observer) {
 		entries.forEach(function(entry) {
 			if (entry.isIntersecting) {
@@ -26,21 +32,19 @@ jQuery( document ).ready(function($) {
 		});
 	});
 	
-	// On button change
-	$('.posts-filter').change(function(){
-		sendAJAX();
-		return false;
-	});
+	// On filter change
+	document.querySelectorAll('.posts-filter').forEach(e =>
+		e.addEventListener('change', (event) => {
+			sendAJAX();
+	}));
 
-	// On load
+	// On initial load
 	sendAJAX();
-	return false;
 });
 
-function load_more() {
-	const loadMore = document.querySelector('#load_more');
-	
-	data = {
+function loadMore() {
+	const loadMore = document.getElementById('load_more');
+	const data = {
 		paged: loadMore.dataset.nextPage
 	}
 	
@@ -101,22 +105,24 @@ function sendAJAX(loadMoreData) {
 }
 
 function updateObserver() {
-	let lazyImages = [].slice.call(document.querySelectorAll('.post-container'));
-	lazyImages.forEach(function(lazyImage) {
-		lazyImageObserver.observe(lazyImage);
-	});
+	const lazyImages = [].slice.call(document.querySelectorAll('.post-container'));
+	lazyImages.forEach(function(lazyImage) { lazyImageObserver.observe(lazyImage); });
 } 
 
 function disableButtons() {
-	jQuery('.radio-toolbar label').css('opacity', '0.5');
-	jQuery('.radio-toolbar label').css('cursor', 'default');
-	jQuery('.posts-filter').attr('disabled', true);
+	const buttons = document.querySelectorAll('.radio-toolbar label');
+	buttons.forEach(function(e) { e.classList.add('disabled'); });
+
+	const filters = document.querySelectorAll('.posts-filter');
+	filters.forEach(function(e) { e.disabled = true; });
 }
 
 function enableButtons() {
-	jQuery('.radio-toolbar label').css('opacity', '1.0');
-	jQuery('.radio-toolbar label').css('cursor', 'pointer');
-	jQuery('.posts-filter').attr('disabled', false);
+	const buttons = document.querySelectorAll('.radio-toolbar label');
+	buttons.forEach(function(e) { e.classList.remove('disabled'); });
+
+	const filters = document.querySelectorAll('.posts-filter');
+	filters.forEach(function(e) { e.disabled = false; });
 }
 
 function incrementLoadMore() {
@@ -125,21 +131,39 @@ function incrementLoadMore() {
 	loadMore.dataset.nextPage++;
 	
 	if (loadMore.dataset.currentPage == loadMore.dataset.maxPage) {
-		jQuery('#load_more').css('visibility', 'hidden');
+		loadMore.style.visibility = 'hidden';
 	}
 }
 
-jQuery( document ).on('scroll', function(e) {
-	var isInfinite = jQuery('input[name=infinite_scroll]').val() === 'true';
+documentReady(function() {
+	let last_known_scroll_position = 0;
+	let ticking = false;
+
+	document.addEventListener('scroll', function(e) {
+	  last_known_scroll_position = window.scrollY;
+
+	  if (!ticking) {
+		window.requestAnimationFrame(function() {
+		  scrollInfinite();
+		  ticking = false;
+		});
+
+		ticking = true;
+	  }
+	});
+});
+
+function scrollInfinite() {
+	const isInfinite = document.querySelector('input[name=infinite_scroll]').value === 'true';
 
 	if (isInfinite) {
 
 		var loadMoreButton = document.getElementById("load_more");
 
-		var isDisabled = loadMoreButton.disabled;
-		var isHidden = loadMoreButton.style.visibility === 'hidden';
+		const isDisabled = loadMoreButton.disabled;
+		const isHidden = loadMoreButton.style.visibility === 'hidden';
 
-		var offsetTop = (loadMoreButton.getBoundingClientRect().top + document.documentElement.scrollTop);
+		const offsetTop = (loadMoreButton.getBoundingClientRect().top + document.documentElement.scrollTop);
 
 		if( (jQuery(this).scrollTop() + jQuery(window).height() ) >= offsetTop && !isDisabled && !isHidden){
 			disableLoadMore(true);
@@ -148,7 +172,7 @@ jQuery( document ).on('scroll', function(e) {
 			loadMoreButton.dispatchEvent(event);
 		}
 	}
-});
+}
 
 function disableLoadMore(disabled) {
 	document.getElementById("load_more").disabled = disabled;
