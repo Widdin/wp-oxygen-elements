@@ -25,6 +25,19 @@ class PostFilter extends OxyEl {
 	
     function controls() {
 
+        // Query Settings
+        $query_section = $this->addControlSection("query_section", __("Query Settings"), "assets/icon.png", $this);
+        $query_per_page = $query_section->addOptionControl(
+            array(
+                "type" => 'textfield',
+                "name" => 'Posts per page',
+                "slug" => 'posts_per_page'
+            )
+        );
+        $query_per_page->rebuildElementOnChange();
+        $query_per_page->setDefaultValue('10');
+        $query_per_page->whitelist();
+
         // Filter
         $filter_section = $this->addControlSection("filter_section", __("Filter"), "assets/icon.png", $this);
         $filter_section->typographySection(
@@ -137,7 +150,7 @@ class PostFilter extends OxyEl {
 				echo '</div>';
 			}
 			?>
-
+			<input type="hidden" name="posts_per_page" value="<?= $options['posts_per_page'] ?>">
 			<input type="hidden" name="action" value="postsfilter">
 		</form>
 
@@ -150,15 +163,21 @@ class PostFilter extends OxyEl {
 	function posts_filter_function(){
 
 		$paged = 1;
+		$posts_per_page = 10;
 
 		if( isset($_POST['paged'])) {
 			$paged = sanitize_text_field( $_POST['paged'] );
+		}
+		
+		if( isset($_POST['posts_per_page'])) {
+			$posts_per_page = sanitize_text_field( $_POST['posts_per_page'] );
 		}
 
 		$args = array(
 			'post_type' => 'post',
 			'post_status' => 'publish',
-			'paged' => $paged
+			'paged' => $paged,
+			'posts_per_page' => $posts_per_page
 		);
 
 		if( isset( $_POST['posts_category'] ) &&  $_POST['posts_category'] != -1 )
