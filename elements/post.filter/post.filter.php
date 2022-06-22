@@ -115,13 +115,11 @@ class PostFilter extends OxyEl {
 			<?php
 			if( $terms = get_terms( array( 'taxonomy' => 'category', 'orderby' => 'name' ) ) ) {
 
-				$total_count = 0;
 				$output = "";
 
 				echo '<div class="radio-toolbar">';
 
 				foreach ( $terms as $term ) {
-					$total_count += $term->count;
 
 					$input = '<input id="' . esc_html( $term->name ) . '" type="radio" class="posts-filter" name="posts_category" value="' . esc_html( $term->term_id ) . '" />';
 					$label =  '<label for="' . esc_html( $term->name ) . '" class="radio-filter">' . esc_html( $term->name ) . " (" . esc_html( $term->count ) . ') </label>';
@@ -130,7 +128,7 @@ class PostFilter extends OxyEl {
 				}
 
 				echo '<input id="all" type="radio" class="posts-filter" name="posts_category" value="-1" checked />';
-				echo '<label for="all">All (' . esc_html( $total_count ) . ')</label>';
+				echo '<label for="all">All (' . wp_count_posts( $post_type = 'post' )->publish . ')</label>';
 
 				echo $output;
 
@@ -225,11 +223,13 @@ class PostFilter extends OxyEl {
 			
 			if ( $paged == 1 ) {
 				echo '</div>';
+				
+				if ($query->max_num_pages > 1 && $paged < $query->max_num_pages) {
+					echo '<button id="load_more" data-current-page="'. esc_html( $paged ) .'" data-next-page="'. esc_html( ($paged + 1) ) .'" data-max-page="'. esc_html( $query->max_num_pages ) .'" onClick="load_more()">Load more</button>';
+				}
 			}
 
-			if ($query->max_num_pages > 1 && $paged < $query->max_num_pages) {
-				echo '<button id="load_more" data-current-page="'. esc_html( $paged ) .'" data-next-page="'. esc_html( ($paged + 1) ) .'" data-max-page="'. esc_html( $query->max_num_pages ) .'" onClick="load_more()">Load more</button>';
-			}
+
 	
 			wp_reset_postdata();
 		}
