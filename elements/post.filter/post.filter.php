@@ -253,7 +253,7 @@ class PostFilter extends OxyEl {
 				echo '</div>';
 				
 				if ($query->max_num_pages > 1 && $paged < $query->max_num_pages) {
-					echo '<button id="load_more" data-current-page="'. esc_html( $paged ) .'" data-next-page="'. esc_html( ($paged + 1) ) .'" data-max-page="'. esc_html( $query->max_num_pages ) .'" onClick="load_more()">Load more</button>';
+					echo '<button id="load_more" data-current-page="'. esc_html( $paged ) .'" data-next-page="'. esc_html( ($paged + 1) ) .'" data-max-page="'. esc_html( $query->max_num_pages ) .'" onClick="loadMore()">Load more</button>';
 				}
 			}
 

@@ -111,6 +111,11 @@
 	opacity: 0;
 }
 
+.disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
 @keyframes fadeOut {
 	0% {
 		opacity: 1;
